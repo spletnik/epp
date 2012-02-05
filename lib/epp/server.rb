@@ -19,13 +19,14 @@ module Epp #:nodoc:
     def initialize(attributes = {})
       requires!(attributes, :tag, :password, :server)
       
-      @tag        = attributes[:tag]
-      @password   = attributes[:password]
-      @server     = attributes[:server]
-      @port       = attributes[:port] || 700
-      @clTRID     = attributes[:clTRID] || "ABC-12345"
-      @old_server = attributes[:old_server] || false
-      @lang       = attributes[:lang] || 'en'
+      @tag         = attributes[:tag]
+      @password    = attributes[:password]
+      @server      = attributes[:server]
+      @port        = attributes[:port] || 700
+      @clTRID      = attributes[:clTRID] || "ABC-12345"
+      @old_server  = attributes[:old_server] || false
+      @lang        = attributes[:lang] || 'en'
+      @ssl_version = attributes[:ssl_version]
     end
     
     # Sends an XML request to the EPP server, and receives an XML response. 
@@ -128,6 +129,7 @@ module Epp #:nodoc:
     def open_connection
       @connection = TCPSocket.new(@server, @port)
       @socket     = OpenSSL::SSL::SSLSocket.new(@connection)
+      @socket.context.ssl_version = @ssl_version if @ssl_version
       
       # Synchronously close the connection & socket
       @socket.sync_close
